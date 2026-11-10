@@ -1,0 +1,265 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>POS — Tienda</title>
+<link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+<header class="topbar">
+  <h1>🛒 Punto de Venta</h1>
+  <span id="estado-conexion" class="estado online">En línea</span>
+</header>
+
+<nav class="nav">
+  <button class="nav-btn activo" data-vista="vista-ventas">Ventas</button>
+  <button class="nav-btn" data-vista="vista-inventario">Inventario</button>
+  <button class="nav-btn" data-vista="vista-clientes">Clientes</button>
+  <button class="nav-btn" data-vista="vista-compras">Compras</button>
+  <button class="nav-btn" data-vista="vista-caja">Caja</button>
+  <button class="nav-btn" data-vista="vista-historial">Historial</button>
+</nav>
+
+<main>
+
+  <!-- ===================== VENTAS ===================== -->
+  <section id="vista-ventas" class="vista activa">
+
+    <div class="tickets-tabs" id="tickets-tabs"></div>
+
+    <div class="atajos-bar">
+      <button class="atajo-btn" id="atajo-varios">Varios</button>
+      <button class="atajo-btn" id="atajo-comun">Común</button>
+      <button class="atajo-btn" id="atajo-buscar">Buscar</button>
+      <button class="atajo-btn" id="atajo-mayoreo">Mayoreo</button>
+      <button class="atajo-btn" id="atajo-entrada">Entradas</button>
+      <button class="atajo-btn" id="atajo-salida">Salida</button>
+      <button class="atajo-btn" id="atajo-borrar">Borrar Art.</button>
+      <button class="atajo-btn" id="atajo-verificador">Verificador</button>
+    </div>
+
+    <div class="ventas-layout">
+
+      <div class="panel-scan">
+        <label for="input-scan">Escanea o escribe código / nombre del producto</label>
+        <input id="input-scan" type="text" autocomplete="off" placeholder="Código de barras o nombre..." autofocus>
+        <div id="sugerencias" class="sugerencias"></div>
+
+        <table class="tabla-carrito">
+          <thead>
+            <tr><th>Código</th><th>Producto</th><th>Precio</th><th>Cant.</th><th>Importe</th><th>Existencia</th><th></th></tr>
+          </thead>
+          <tbody id="carrito-body"></tbody>
+        </table>
+
+        <div class="ticket-acciones">
+          <button class="btn-mini" id="btn-cambiar-ticket">Cambiar</button>
+          <button class="btn-mini" id="btn-pendiente-ticket">Pendiente</button>
+          <button class="btn-mini btn-quitar" id="btn-eliminar-ticket">Eliminar</button>
+          <button class="btn-mini" id="btn-asignar-cliente-ticket">Asignar cliente</button>
+        </div>
+        <div id="ticket-cliente-chip" class="cliente-chip" style="display:none; margin-top:8px;"></div>
+      </div>
+
+      <div class="panel-total">
+        <div class="total-label">Total</div>
+        <div id="carrito-total" class="total-monto">$0.00</div>
+        <button id="btn-cobrar" class="btn-primario" disabled>Cobrar</button>
+        <button id="btn-cancelar-venta" class="btn-secundario">Cancelar venta</button>
+        <button id="btn-reimprimir" class="btn-secundario">Reimprimir último tícket</button>
+        <button id="btn-ventas-dia" class="btn-secundario">Ventas del día y Devoluciones</button>
+      </div>
+
+    </div>
+  </section>
+
+  <!-- ===================== INVENTARIO ===================== -->
+  <section id="vista-inventario" class="vista">
+    <div class="toolbar">
+      <input id="input-buscar-inventario" type="text" placeholder="Buscar producto...">
+      <button id="btn-nuevo-producto" class="btn-primario">+ Nuevo producto</button>
+    </div>
+
+    <div class="tabla-scroll">
+      <table class="tabla-inventario">
+        <thead>
+          <tr>
+            <th>Código</th><th>Nombre</th><th>Categoría</th><th>Costo</th>
+            <th>Precio</th><th>Margen</th><th>Stock</th><th></th>
+          </tr>
+        </thead>
+        <tbody id="inventario-body"></tbody>
+      </table>
+    </div>
+  </section>
+
+  <!-- ===================== CLIENTES / FIADO ===================== -->
+  <section id="vista-clientes" class="vista">
+    <div class="toolbar">
+      <input id="input-buscar-cliente" type="text" placeholder="Buscar cliente...">
+      <button id="btn-nuevo-cliente" class="btn-primario">+ Nuevo cliente</button>
+    </div>
+    <div id="clientes-lista"></div>
+  </section>
+
+  <!-- ===================== COMPRAS ===================== -->
+  <section id="vista-compras" class="vista">
+    <div class="panel-scan" style="margin-bottom:16px;">
+      <label for="input-proveedor">Proveedor (opcional)</label>
+      <input id="input-proveedor" type="text" placeholder="Nombre del proveedor...">
+
+      <label for="input-compra-codigo" style="margin-top:10px;">Código de producto</label>
+      <input id="input-compra-codigo" type="text" autocomplete="off" placeholder="Código de barras o nombre...">
+
+      <div class="form-fila" style="margin-top:10px;">
+        <div>
+          <label for="input-compra-cantidad">Cantidad</label>
+          <input id="input-compra-cantidad" type="number" min="1" value="1">
+        </div>
+        <div>
+          <label for="input-compra-costo">Costo unitario</label>
+          <input id="input-compra-costo" type="number" step="0.01" min="0">
+        </div>
+      </div>
+      <button id="btn-agregar-item-compra" class="btn-secundario" style="margin-top:12px;">+ Agregar a la compra</button>
+
+      <table class="tabla-carrito">
+        <thead><tr><th>Producto</th><th>Cant.</th><th>Costo u.</th><th>Subtotal</th><th></th></tr></thead>
+        <tbody id="compra-body"></tbody>
+      </table>
+      <div class="total-label" style="margin-top:10px;">Total de la compra</div>
+      <div id="compra-total" class="total-monto" style="font-size:24px;">$0.00</div>
+      <button id="btn-guardar-compra" class="btn-primario">Guardar compra</button>
+    </div>
+
+    <h3>Historial de compras</h3>
+    <div id="compras-lista"></div>
+  </section>
+
+  <!-- ===================== CAJA / CORTE ===================== -->
+  <section id="vista-caja" class="vista">
+    <div class="panel-total" style="text-align:left; margin-bottom:16px;">
+      <div class="caja-fila"><span>Fondo de caja</span><strong id="caja-fondo">$0.00</strong></div>
+      <div class="caja-fila"><span>Ventas en efectivo</span><strong id="caja-efectivo">$0.00</strong></div>
+      <div class="caja-fila"><span>Ventas con tarjeta</span><strong id="caja-tarjeta">$0.00</strong></div>
+      <div class="caja-fila"><span>Ventas a crédito</span><strong id="caja-credito">$0.00</strong></div>
+      <div class="caja-fila"><span>Entradas de efectivo</span><strong id="caja-entradas">$0.00</strong></div>
+      <div class="caja-fila"><span>Salidas de efectivo</span><strong id="caja-salidas">$0.00</strong></div>
+      <hr>
+      <div class="caja-fila"><span>Efectivo esperado en caja</span><strong id="caja-esperado">$0.00</strong></div>
+    </div>
+
+    <div class="toolbar">
+      <button id="btn-entrada-caja" class="btn-secundario" style="color:var(--verde-oscuro); border-color:var(--verde);">+ Entrada de efectivo</button>
+      <button id="btn-salida-caja" class="btn-secundario">+ Salida de efectivo</button>
+      <button id="btn-hacer-corte" class="btn-primario">Hacer corte</button>
+    </div>
+
+    <h3>Cortes anteriores</h3>
+    <div id="cortes-lista"></div>
+  </section>
+
+  <!-- ===================== HISTORIAL ===================== -->
+  <section id="vista-historial" class="vista">
+    <div id="historial-lista"></div>
+  </section>
+
+</main>
+
+<!-- ===================== MODAL: COBRO ===================== -->
+<div id="modal-cobro" class="modal">
+  <div class="modal-caja">
+    <button class="modal-cerrar" id="modal-cobro-cerrar">×</button>
+    <h2>Cobrar</h2>
+    <div class="cobro-total">Total: <span id="modal-cobro-total">$0.00</span></div>
+
+    <div class="metodo-pago">
+      <button type="button" class="metodo-btn activo" data-metodo="efectivo">Efectivo</button>
+      <button type="button" class="metodo-btn" data-metodo="tarjeta">Tarjeta</button>
+      <button type="button" class="metodo-btn" data-metodo="credito">Crédito</button>
+    </div>
+
+    <div id="panel-efectivo">
+      <label for="input-recibido">Efectivo recibido</label>
+      <input id="input-recibido" type="number" step="0.01" placeholder="0.00">
+      <div class="cobro-cambio">Cambio: <span id="modal-cobro-cambio">$0.00</span></div>
+    </div>
+
+    <div id="panel-credito" style="display:none">
+      <label for="input-cliente-buscar">Cliente</label>
+      <input id="input-cliente-buscar" type="text" autocomplete="off" placeholder="Buscar o escribir nombre nuevo...">
+      <div id="sugerencias-clientes" class="sugerencias"></div>
+      <div id="cliente-seleccionado" class="cliente-chip" style="display:none"></div>
+    </div>
+
+    <button id="btn-confirmar-cobro" class="btn-primario">Confirmar venta</button>
+  </div>
+</div>
+
+<!-- ===================== MODAL: PRODUCTO ===================== -->
+<div id="modal-producto" class="modal">
+  <div class="modal-caja">
+    <button class="modal-cerrar" id="form-producto-cerrar">×</button>
+    <h2 id="form-producto-titulo">Nuevo producto</h2>
+    <form id="form-producto">
+      <label for="input-codigo">Código de barras</label>
+      <input id="input-codigo" type="text" required>
+
+      <label for="input-nombre">Nombre</label>
+      <input id="input-nombre" type="text" required>
+
+      <label for="input-categoria">Categoría</label>
+      <input id="input-categoria" type="text">
+
+      <div class="form-fila">
+        <div>
+          <label for="input-costo">Costo</label>
+          <input id="input-costo" type="number" step="0.01" min="0">
+        </div>
+        <div>
+          <label for="input-precio">Precio de venta</label>
+          <input id="input-precio" type="number" step="0.01" min="0" required>
+        </div>
+      </div>
+
+      <div class="form-fila">
+        <div>
+          <label for="input-stock">Stock actual</label>
+          <input id="input-stock" type="number" min="0" required>
+        </div>
+        <div>
+          <label for="input-stock-minimo">Stock mínimo (alerta)</label>
+          <input id="input-stock-minimo" type="number" min="0">
+        </div>
+      </div>
+
+      <button type="submit" class="btn-primario">Guardar</button>
+    </form>
+  </div>
+</div>
+
+<!-- ===================== MODAL: VENTAS DEL DÍA / DEVOLUCIONES ===================== -->
+<div id="modal-ventas-dia" class="modal">
+  <div class="modal-caja" style="max-width:520px;">
+    <button class="modal-cerrar" id="modal-ventas-dia-cerrar">×</button>
+    <h2>Ventas del día</h2>
+    <div id="ventas-dia-total" class="cobro-total"></div>
+    <div id="ventas-dia-lista"></div>
+  </div>
+</div>
+
+<div id="area-imprimir" style="display:none;"></div>
+
+<script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-firestore-compat.js"></script>
+<script src="firebase-config.js"></script>
+<script src="db.js"></script>
+<script src="sync.js"></script>
+<script src="app.js"></script>
+<script src="clientes.js"></script>
+<script src="compras.js"></script>
+<script src="caja.js"></script>
+</body>
+</html>
